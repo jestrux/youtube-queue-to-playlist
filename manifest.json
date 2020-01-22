@@ -1,0 +1,22 @@
+{
+    "name": "queuer",
+    "version": "1.0",
+    "manifest_version": 2,
+    "content_scripts": [
+      {
+        "matches": ["https://www.youtube.com/*"],
+        "js": ["content.js"]
+      }
+    ],
+    "browser_action": {
+      "default_title": "Queuer"
+    },
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "permissions": ["identity", "tabs", "https://accounts.google.com/*", "https://www.googleapis.com/*"],
+    "oauth2": {
+        "client_id": "72821276253-8bhuklniu85cjnk185124052j5vb11e6.apps.googleusercontent.com",
+        "scopes": ["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/youtube"]
+    }
+}
