@@ -1,6 +1,8 @@
 var miniPlayer;
 var popup;
 var popupWindow;
+var queueVideos;
+var token;
 
 window.onload = function(){
     miniPlayer = document.querySelector("ytd-miniplayer");
@@ -55,6 +57,11 @@ window.addEventListener("message", function(e){
     }
 });
 
+function emitMessage(action, payload){
+    const message = {action, payload};
+    popupWindow.postMessage(message, chrome.runtime.getURL(""));
+}
+
 function addSavePlaylistButton(){
     console.log("\n\n [QUEUER DEBUGGER] Creating playlist save button....");
     const button = document.createElement("button");
@@ -88,11 +95,19 @@ async function handleSaveButtonClicked(e){
         }
     ));
     queueLinks = queueLinks.filter((_, index) => index < queueLinks.length / 2);
-    const queueVideos = queueLinks.map(({url}) => url.split("watch?v=")[1]);    
+    queueVideos = queueLinks.map(({url}) => url.split("watch?v=")[1]);    
     console.log("\n\n [QUEUER DEBUGGER] Queue videi ids: ", queueVideos);
 
     popup.classList.add("visible");
-    popupWindow.postMessage("show", chrome.runtime.getURL(""));
+    // saveVideosToPlaylist(queueVideos);
+    
+    try {
+        token = await authenticateUser();
+        emitMessage('auth-success');
+    } catch (error) {
+        emitMessage('auth-error', error);
+        console.log("\n\n [QUEUER DEBUGGER] Auth failed: ", error);
+    }
 }
 
 // saveVideosToPlaylist();
@@ -100,7 +115,7 @@ async function handleSaveButtonClicked(e){
 async function saveVideosToPlaylist(videos){
     try {
         const token = await authenticateUser();
-        const playlistId = await getPrefferedPlaylist(token);
+        // const playlistId = await getPrefferedPlaylist(token);
         // const playlistId = "PLaEj9pMixBr0fLN-vBFvTVe4wTs4rTbrJ";
         // const videos = ["id28fCyYgIU", "QN0THk3z-eg"];
         addVideosToPlaylist(token, playlistId, videos);
@@ -135,8 +150,21 @@ function fetchUserPlaylists(token){
     chrome.runtime.sendMessage(message, (payload, error) => {
         if(error)
             console.log("\n\n [QUEUER DEBUGGER] Error fetching user playlists, ", payload)
-        else
+        else{
             console.log("\n\n [QUEUER DEBUGGER] User playlists fetched", payload);
+            // setTimeout(() => {
+            //     emitMessage("playlists-fetched", [
+            //         {
+            //             id: "51eaafa",
+            //             title: "Fairly pl"
+            //         },
+            //         {
+            //             id: "hdfhdfh36346",
+            //             title: "Avec Moi"
+            //         }
+            //     ]);
+            // }, 1000);
+        }
     });
 }
 
