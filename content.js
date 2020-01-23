@@ -42,46 +42,106 @@ function addSavePlaylistButton(){
     button.style.cursor = "pointer";
 
     button.innerText = "SAVE PLAYLIST";
+    button.classList.add("queue-playlist-saver");
 
-    button.onclick = (e) => createPlaylist(e);
+    button.onclick = (e) => handleSaveButtonClicked(e);
 
     const queueActions = document.querySelector("ytd-playlist-panel-renderer #end-actions");
-    if(queueActions)
+    if(queueActions){
+        if(queueActions.querySelector(".queue-playlist-saver")){
+            console.log("\n\n [QUEUER DEBUGGER] Save playlist button was already created");
+            return;
+        }
+
         queueActions.prepend(button);
+    }
     else
         console.log("\n\n [QUEUER DEBUGGER] QueueActions not found");
 }
 
-function createPlaylist(e){
+async function handleSaveButtonClicked(e){
     e.stopPropagation();
     console.log("\n\n [QUEUER DEBUGGER] creating playlist button clicked....");
     const queueItems = document.querySelectorAll("ytd-playlist-panel-video-renderer > a");
-    const queueLinks = Array.from(queueItems).map(a => (
+    let queueLinks = Array.from(queueItems).map(a => (
         {
             title: a.querySelector("#video-title").innerText,
             image: a.querySelector("img").src,
             url: a.href.split('&list')[0] 
         }
     ));
-    const playlist = queueLinks.filter((_, index) => index < queueLinks.length / 2);
-    savePlaylist(playlist);
-    return true;
+    queueLinks = queueLinks.filter((_, index) => index < queueLinks.length / 2);
+    const queueVideos = queueLinks.map(({url}) => url.split("watch?v=")[1]);    
+    console.log("\n\n [QUEUER DEBUGGER] Queue videi ids: ", queueVideos);
 }
 
-function savePlaylist(items){
-    // console.log("\n\n [QUEUER DEBUGGER] Mini player expanded, videos: ", items, chrome);
-    // chrome.identity.getAccounts((accounts) => {
-    //     console.log("\n\n [QUEUER DEBUGGER] Chrome user accounts: ", accounts);
-    // })
+// saveVideosToPlaylist();
 
-    chrome.runtime.sendMessage(items);
+async function saveVideosToPlaylist(videos){
+    try {
+        const token = await authenticateUser();
+        const playlistId = await getPrefferedPlaylist(token);
+        // const playlistId = "PLaEj9pMixBr0fLN-vBFvTVe4wTs4rTbrJ";
+        // const videos = ["id28fCyYgIU", "QN0THk3z-eg"];
+        addVideosToPlaylist(token, playlistId, videos);
+    } catch (error) {
+        console.log("\n\n [QUEUER DEBUGGER] Failed to save videos to playlist: ", error);
+    }
+}
 
-    chrome.runtime.onMessage.addListener(function (err) {
-        console.log("\n\n [QUEUER DEBUGGER] Error in bg task: ", err);
-        // handlePlaylistSave(err);
+function getPrefferedPlaylist(token){
+    return new Promise(async (resolve, reject) => {
+        // fetchUserPlaylists(token);
+        // createNewPlaylist(token, playlistName);
     });
 }
 
-function handlePlaylistSave(res){
-    console.log("\n\n [QUEUER DEBUGGER] Playlist saved: ", res);
+function authenticateUser(){
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({type: "login"}, (payload, error) => {
+            if(error)
+                reject(payload)
+            else
+                resolve(payload);
+        });
+    });
+}
+
+function fetchUserPlaylists(token){
+    const message = {
+        type: "fetch-playlists", 
+        data: token
+    };
+    chrome.runtime.sendMessage(message, (payload, error) => {
+        if(error)
+            console.log("\n\n [QUEUER DEBUGGER] Error fetching user playlists, ", payload)
+        else
+            console.log("\n\n [QUEUER DEBUGGER] User playlists fetched", payload);
+    });
+}
+
+function createNewPlaylist(token, title, description = ""){
+    const message = {
+        type: "create-playlist", 
+        data: {token, title, description}
+    };
+    chrome.runtime.sendMessage(message, (payload, error) => {
+        if(error)
+            console.log("\n\n [QUEUER DEBUGGER] Error creating playlist, ", payload)
+        else
+            console.log("\n\n [QUEUER DEBUGGER] Playlist created", payload);
+    });
+}
+
+function addVideosToPlaylist(token, playlistId, videos){
+    const message = {
+        type: "add-videos-to-playlist", 
+        data: {token, playlistId, videos}
+    };
+    chrome.runtime.sendMessage(message, (payload, error) => {
+        if(error)
+            console.log("\n\n [QUEUER DEBUGGER] Error adding videos to playlist, ", payload)
+        else
+            console.log("\n\n [QUEUER DEBUGGER] Videos added to playlist", payload);
+    });
 }
