@@ -121,6 +121,15 @@ input{
     z-index: 1;
 }
 
+#tabBar,
+#content > h1,
+#playlistChoicesWrapper{
+    margin-left: -2rem;
+    margin-right: -2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
 #tabBar{
     margin-bottom: 1.6rem;
     border-bottom: 2px solid #ddd;
@@ -150,9 +159,19 @@ svg[role="progressbar"] + span{
     color: #727272;
 }
 
+#playlistChoicesWrapper{
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: -1.6rem;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    margin-bottom: 1em;
+    margin-bottom: 1.5em;
+    background: #f3f3f3;
+}
+
 #playlistChoices{
     margin-top: 1rem;
-    margin-bottom: 1.5rem;
 }
 
 .playlist-choice input{

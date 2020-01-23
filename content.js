@@ -2,7 +2,6 @@ var miniPlayer;
 var popup;
 var popupWindow;
 var queueVideos;
-var token;
 
 window.onload = function(){
     miniPlayer = document.querySelector("ytd-miniplayer");
@@ -41,17 +40,22 @@ function setupPopup(){
 }
 
 window.addEventListener("message", function(e){
-    console.log("n\n [QUEUER DEBUGGER] Message from popup: ", e);
-    
     const data = e.data;
     if(data && data.sender === "QUEUER-IFRAME"){
-        console.log("n\n [QUEUER DEBUGGER] Message from popup: ", data.action, data.payload);
+        const { action, payload, token } = data;
 
         switch (data.action) {
             case "close-popup":
                 popup.classList.remove("visible");
                 break;
+            case "fetch-playlists":
+                fetchUserPlaylists(token);
+                break;
+            case "create-playlist":
+                createNewPlaylist(token, payload);
+                break;
             default:
+                console.log("n\n [QUEUER DEBUGGER] Message from popup: ", action, payload);
                 break;
         }
     }
@@ -63,7 +67,7 @@ function emitMessage(action, payload){
 }
 
 function addSavePlaylistButton(){
-    console.log("\n\n [QUEUER DEBUGGER] Creating playlist save button....");
+    // console.log("\n\n [QUEUER DEBUGGER] Creating playlist save button....");
     const button = document.createElement("button");
     button.innerText = "SAVE PLAYLIST";
     button.classList.add("queue-playlist-saver");
@@ -99,18 +103,15 @@ async function handleSaveButtonClicked(e){
     console.log("\n\n [QUEUER DEBUGGER] Queue videi ids: ", queueVideos);
 
     popup.classList.add("visible");
-    // saveVideosToPlaylist(queueVideos);
     
     try {
-        token = await authenticateUser();
-        emitMessage('auth-success');
+        const token = await authenticateUser();
+        emitMessage('auth-success', token);
     } catch (error) {
         emitMessage('auth-error', error);
         console.log("\n\n [QUEUER DEBUGGER] Auth failed: ", error);
     }
 }
-
-// saveVideosToPlaylist();
 
 async function saveVideosToPlaylist(videos){
     try {
@@ -150,34 +151,26 @@ function fetchUserPlaylists(token){
     chrome.runtime.sendMessage(message, (payload, error) => {
         if(error)
             console.log("\n\n [QUEUER DEBUGGER] Error fetching user playlists, ", payload)
-        else{
-            console.log("\n\n [QUEUER DEBUGGER] User playlists fetched", payload);
-            // setTimeout(() => {
-            //     emitMessage("playlists-fetched", [
-            //         {
-            //             id: "51eaafa",
-            //             title: "Fairly pl"
-            //         },
-            //         {
-            //             id: "hdfhdfh36346",
-            //             title: "Avec Moi"
-            //         }
-            //     ]);
-            // }, 1000);
-        }
+        else
+            emitMessage("playlists-fetched", payload);
     });
 }
 
 function createNewPlaylist(token, title, description = ""){
     const message = {
         type: "create-playlist", 
-        data: {token, title, description}
+        data: {token, title}
     };
     chrome.runtime.sendMessage(message, (payload, error) => {
         if(error)
             console.log("\n\n [QUEUER DEBUGGER] Error creating playlist, ", payload)
-        else
+        else{
+            if(!payload.title && payload.snippet)
+                payload.title = payload.snippet.title;
+                
+            emitMessage("playlist-created", payload);
             console.log("\n\n [QUEUER DEBUGGER] Playlist created", payload);
+        }
     });
 }
 

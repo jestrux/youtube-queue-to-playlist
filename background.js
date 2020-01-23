@@ -1,58 +1,57 @@
-chrome.runtime.onMessage.addListener(function (request, sender, callback) {
-    console.log("\n\n [QUEUER DEBUGGER] Auth request received...");
-
-    if(request.type === "login")
-        getAuthuser(callback);
-    else if(request.type === "fetch-playlists")
-        fetchUserPlaylists(request.data, callback);
-    else if(request.type === "create-playlist")
-        createNewPlaylist(request.data, callback);
-    else if(request.type === "add-videos-to-playlist")
-        addVideosToPlaylist(request.data, callback);
+chrome.runtime.onMessage.addListener((request, sender, callback) => {
+    try {
+        if(request.type === "login")
+            getAuthuser().then(callback);
+        else if(request.type === "fetch-playlists")
+            fetchUserPlaylists(request.data)
+                .then(response => response.json())
+                .then(async (response) => formatPlaylists(response.items))
+                .then(callback);
+        else if(request.type === "create-playlist")
+            createNewPlaylist(request.data)
+                .then(response => response.json())
+                .then(response => callback(formatPlaylist(response)));
+        else if(request.type === "add-videos-to-playlist")
+            addVideosToPlaylist(request.data, callback);
+    } catch (error) {
+        callback(error, true);
+    }
 
     return true;
 });
 
-function getAuthuser(callback){
-    chrome.identity.getAuthToken({interactive: true}, function(token) {
-        if (chrome.runtime.lastError) {
-            console.log("\n\n [QUEUER DEBUGGER] Error authenticating user: ", chrome.runtime.lastError.message);
-            callback(chrome.runtime.lastError.message, true);
-            return;
-        }
-
-        console.log("\n\n [QUEUER DEBUGGER] Auth succeeded: ", token);
-        callback(token);
+function getAuthuser(){
+    return new Promise(resolve => {
+        chrome.identity.getAuthToken({interactive: true}, function(token) {
+            if (chrome.runtime.lastError) {
+                console.log("\n\n [QUEUER DEBUGGER] Error authenticating user: ", chrome.runtime.lastError.message);
+                reject(chrome.runtime.lastError.message, true);
+                return;
+            }
+    
+            resolve(token);
+        });
     });
 }
 
 const API_KEY = "AIzaSyB77YFMNsw4t9oV4YMUnjfj5nf5h8Izw7k";
 
-function fetchUserPlaylists(token, callback){
-    fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&mine=true&maxResults=50&key=${API_KEY}`, {
+function fetchUserPlaylists(token){
+    return fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&mine=true&maxResults=50&key=${API_KEY}`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         }
-    })
-    .then(response => response.json())
-    .then(response => formatPlaylists(response.items))
-    .then(callback)
-    .catch(error => callback(error, true));
+    });
 }
 
-function createNewPlaylist(data, callback){
-    const {token, title, description} = data;
+function createNewPlaylist({title, token}){
     const playlistData = {
-        snippet: {
-          title, description,
-          tags: ["sample playlist", "Queuer"],
-          defaultLanguage: "en"
-        },
+        snippet: { title },
         status: {privacyStatus: "private"}
     };
 
-    fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet,status&key=${API_KEY}`, {
+    return fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet,status&key=${API_KEY}`, {
         method: 'post',
         body: JSON.stringify(playlistData),
         headers: {
@@ -60,11 +59,7 @@ function createNewPlaylist(data, callback){
             'Accept': 'application/json',
             'Authorization': `Bearer ${token}`
         }
-    })
-    .then(response => response.json())
-    .then(formatPlaylist)
-    .then(callback)
-    .catch(error => callback(error, true));
+    });
 }
 
 function addVideosToPlaylist(data, callback){
@@ -106,23 +101,22 @@ function recursivelyAddVideosToPlaylist(token, playlistId, videos, callback, ind
     });
 }
 
-function formatPlaylists(playlists){
+function formatPlaylists(unformattedPlaylists){
     return new Promise(resolve => {
-        playlists = playlists.map(async (playlist) => {
-            return await formatPlaylist(playlist);
-        });
-
+        const playlists = unformattedPlaylists.map(playlist => formatPlaylist(playlist));
         resolve(playlists);
     })
 }
 
 function formatPlaylist(playlist){
-    return new Promise(resolve => {
-        resolve({
-            id: playlist.id,
-            title: playlist.snippet.title,
-            image: playlist.snippet.thumbnails.medium.url,
-            publishedAt: playlist.snippet.publishedAt
-        });
-    })
+    if(!playlist.snippet)
+        return playlist;
+
+    return {
+        id: playlist.id,
+        title: playlist.snippet.title,
+        image: playlist.snippet.thumbnails.medium.url,
+        publishedAt: playlist.snippet.publishedAt,
+        "other": "asfafa"
+    }
 }

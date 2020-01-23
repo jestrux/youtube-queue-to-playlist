@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-    <div id="content" x-data="{authenticating: true, tab: 'add', fetchingPlaylists: false, playlists: [], addingVideos: false}"
+    <div id="content" x-data="{authenticating: true, tab: 'add', creatingPlaylist: false, fetchingPlaylists: false, playlists: [], playlistChoice: {}, addingVideos: false}"
         @playlists-fetched.window="fetchingPlaylists = false; playlists = $event.detail;"
-        @auth-success.window="authenticating = false;">
+        @auth-success.window="authenticating = false; window.token = $event.detail">
         <button id="closeButton" class="layout center-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
@@ -27,8 +27,8 @@
     
         <div x-show="tab === 'add'">
             <form id="newPlaylistForm"
-                x-data="{ creatingPlaylist: false }"
-                @submit="creatingPlaylist = true">
+                @submit="creatingPlaylist = true"
+                @playlist-created.window="creatingPlaylist = false; playlistChoice = $event.detail; addingVideos = true">
                 <label class="label">
                     Playlist Name&emsp;
                     <input required name="playlist" type="text" />
@@ -53,15 +53,20 @@
                 <span>Fetching your playlists...</span>
             </div>
 
-            <form x-show="!fetchingPlaylists" id="existingPlaylistForm">
-                <label class="label">Choose playlist</label>
-                <div id="playlistChoices" class="layout wrap">
-                    <template x-for="playlist in playlists" :key="playlist.id">
-                        <label required for="playlist1" class="playlist-choice">
-                            <input id="playlist1" type="radio" name="playlist" value="playlist.id" />
-                            <span class="layout center" x-text="playlist.title"></span>
-                        </label>
-                    </template>
+            <form id="existingPlaylistForm"
+                 x-show="!fetchingPlaylists"
+                 @submit="addingVideos = true">
+                <input required type="hidden" name="playlist" x-model="playlistChoice.id">
+                <div id="playlistChoicesWrapper">
+                    <div id="playlistChoices" class="layout wrap">
+                        <template x-for="playlist in playlists" :key="playlist.id">
+                            <label :for="playlist.id" class="playlist-choice">
+                                <input :id="playlist.id" type="radio" name="playlistChoice"
+                                    @input="playlistChoice = playlist" />
+                                <span class="layout center" x-text="playlist.title"></span>
+                            </label>
+                        </template>
+                    </div>
                 </div>
         
                 <button>Submit Choice</button>
@@ -70,7 +75,7 @@
 
         <div x-show="addingVideos" class="full-overlay layout vertical center-center">
             <svg role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" style="background: none"><circle cx="50" cy="50" fill="none" stroke="#555" stroke-width="3" r="35" stroke-dasharray="164.93361431346415 56.97787143782138" transform="rotate(269.874 50 50)"><animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 50;360 50 50" keyTimes="0;1" dur="1s" begin="0s" repeatCount="indefinite"></animateTransform></circle></svg>
-            <span>Saving videos to <strong>Watu wengi</strong> playlist...</span>
+            <span>Saving videos to <strong x-text="playlistChoice.title"></strong> playlist...</span>
         </div>
         
         <div x-show="authenticating" class="full-overlay layout vertical center-center">

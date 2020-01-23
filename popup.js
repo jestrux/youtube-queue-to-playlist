@@ -1,10 +1,11 @@
-// document.addEventListener('DOMContentLoaded', function () {
-//     const bg = chrome.extension.getBackgroundPage();
-//     console.log("Bg task: ", bg.playlist, bg.access_token);
-// });
+window.token = null;
+
 document.querySelector("#closeButton").onclick = (e) => closePopup(e);
 document.querySelector("#existingPlaylistsTabButton").onclick = (e) => fetchPlaylists(e);
-document.querySelector("#existingPlaylistForm").onsubmit = (e) => saveVideosToPlaylists(e);
+document.querySelector("#existingPlaylistForm").onsubmit = (e) => {
+    e.preventDefault();
+    playlistSelected(e.target.playlist.value);
+};
 document.querySelector("#newPlaylistForm").onsubmit = (e) => createPlaylist(e);
 
 function createPlaylist(e){
@@ -22,9 +23,8 @@ function fetchPlaylists(e){
     playlistsFetched = true;
 }
 
-function saveVideosToPlaylists(e){
-    e.preventDefault();
-    emitMessage("fetch-playlists");
+function playlistSelected(playlist){
+    emitMessage("playlist-selected", playlist);
 }
 
 function closePopup(e){
@@ -34,7 +34,7 @@ function closePopup(e){
 }
 
 function emitMessage(action, payload){
-    const message = {sender: "QUEUER-IFRAME", action, payload};
+    const message = {sender: "QUEUER-IFRAME", action, payload, token: window.token};
     window.parent.postMessage(message, "*");
 }
 
@@ -45,5 +45,3 @@ window.addEventListener("message", function(e){
         window.dispatchEvent(event);
     }
 })
-
-// fetchingPlaylists = false; playlists = $event.detail
