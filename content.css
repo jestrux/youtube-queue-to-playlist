@@ -1,0 +1,38 @@
+#QUEUER-IFRAME{
+    position: fixed;
+    z-index: 10000;
+    width: 100vw;
+    height: 100vh;
+}
+
+#QUEUER-IFRAME:not(.visible){
+    opacity: 0;
+    pointer-events: none;
+}
+
+.queue-playlist-saver{
+    height: 37px;
+    margin-right: 0.4rem;
+    margin-top: 0.85rem;
+    font-size: 1.4rem;
+    display: inline-flex;
+    align-items: center;
+    border: none;
+    font-family: Roboto;
+    font-weight: 500;
+    color: rgb(96, 96, 96);
+    outline: none;
+    cursor: pointer;
+    background: #ececec;
+    line-height: 1em;
+    border-radius: 3px;
+    padding: 0.7em 0.8em;
+}
+
+.queue-playlist-saver:hover{
+    background: #e5e4e4;
+}
+
+.queue-playlist-saver:active{
+    background: #dbdada;
+}

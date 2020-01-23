@@ -1,4 +1,7 @@
 var miniPlayer;
+var popup;
+var popupWindow;
+
 window.onload = function(){
     miniPlayer = document.querySelector("ytd-miniplayer");
     console.log("\n\n [QUEUER DEBUGGER] window loaded\n\n ");
@@ -17,30 +20,44 @@ window.onload = function(){
         }
     });
     
-    if(miniPlayer)
+    if(miniPlayer){
         observer.observe(miniPlayer, {attributes: true});
+        setupPopup();
+    }
     else
         console.log("\n\n [QUEUER DEBUGGER] Mini player not found, maybe from background task \n\n ");
 }
 
+function setupPopup(){
+    popup = document.createElement ("iframe");
+    popup.src  = chrome.extension.getURL("popup.htm");
+    popup.id = "QUEUER-IFRAME";
+    document.body.appendChild(popup);
+    popupWindow = popup.contentWindow;
+
+    console.log("n\n [QUEUER DEBUGGER] Pop up has been set up");
+}
+
+window.addEventListener("message", function(e){
+    console.log("n\n [QUEUER DEBUGGER] Message from popup: ", e);
+    
+    const data = e.data;
+    if(data && data.sender === "QUEUER-IFRAME"){
+        console.log("n\n [QUEUER DEBUGGER] Message from popup: ", data.action, data.payload);
+
+        switch (data.action) {
+            case "close-popup":
+                popup.classList.remove("visible");
+                break;
+            default:
+                break;
+        }
+    }
+});
+
 function addSavePlaylistButton(){
     console.log("\n\n [QUEUER DEBUGGER] Creating playlist save button....");
     const button = document.createElement("button");
-    button.style.height = "37px";
-    button.style.marginRight = "0.4rem";
-    button.style.marginTop = "0.671rem";
-    button.style.fontSize = "1.4rem";
-    button.style.display = "inline-flex";
-    button.style.alignItems = "center";
-    button.style.padding = "0.7em 0.57em";
-    button.style.background = "transparent";
-    button.style.border = "none";
-    button.style.fontFamily = "Roboto";
-    button.style.fontWeight = 500;
-    button.style.color = "#606060";
-    button.style.outline = "none";
-    button.style.cursor = "pointer";
-
     button.innerText = "SAVE PLAYLIST";
     button.classList.add("queue-playlist-saver");
 
@@ -73,6 +90,9 @@ async function handleSaveButtonClicked(e){
     queueLinks = queueLinks.filter((_, index) => index < queueLinks.length / 2);
     const queueVideos = queueLinks.map(({url}) => url.split("watch?v=")[1]);    
     console.log("\n\n [QUEUER DEBUGGER] Queue videi ids: ", queueVideos);
+
+    popup.classList.add("visible");
+    popupWindow.postMessage("show", chrome.runtime.getURL(""));
 }
 
 // saveVideosToPlaylist();

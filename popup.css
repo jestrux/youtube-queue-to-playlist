@@ -1,0 +1,201 @@
+body{
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Verdana;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+*{
+    box-sizing: border-box;
+}
+
+#content{
+    position: relative;
+    width: 550px;
+    padding: 2em;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.2);
+    transition: transform 0.35s ease-out;
+}
+
+#content > button {
+    position: absolute;
+    top: -1em;
+    right: -1em;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    padding: 0;
+    background: #111;
+    color: #fff;
+    border-color: #111;
+}
+
+.layout{
+    display: flex;
+}
+
+.layout.center,
+.layout.center-center{
+    align-items: center;
+}
+
+.layout.center-center{
+    justify-content: center;
+}
+
+.layout.vertical{
+    flex-direction: column;
+}
+
+.layout.wrap{
+    flex-wrap: wrap;
+}
+
+h1, h2{
+    margin-top: 0;
+}
+
+button {
+    background: white;
+    border: 2px solid #777;
+    line-height: 1;
+    border-radius: 50px;
+    padding: 0.6em 1.5em;
+    font-size: 1.1em;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    outline: none;
+    cursor: pointer;
+}
+
+button.disabled,
+button[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+button:hover{
+    background: #eee;
+}
+
+button:active{
+    background: #ccc;
+}
+
+.label{
+    font-size: 1.3em;
+    display: block;
+}
+
+input{
+    display: block;
+    width: 100%;
+    max-width: 350px;
+    margin-top: 0.6em;
+    margin-bottom: 1em;
+    font-size: 1.1em;
+    padding: 0.5em 0.6em;
+    outline: none;
+    border-radius: 4px;
+    border: 2px solid #aaa;
+}
+
+#formsWrapper{
+    position: relative;
+}
+
+#addingVideosLoader{
+    position: absolute;
+    top: 2em;
+    left: 2em;
+    right: 2em;
+    bottom: 2em;
+    background: rgba(255, 255, 255, 0.92);
+    z-index: 1;
+}
+
+#tabBar{
+    margin-bottom: 1.6em;
+    border-bottom: 2px solid #ddd;
+}
+
+#tabBar button{
+    border-radius: 0;
+    margin-bottom: -2px;
+    margin-right: -0.3em;
+    border-color: transparent;
+    border-bottom-color: #ddd;
+    padding: 0.9em 0.6em;
+}
+
+#tabBar button.active{
+    border-bottom-color: #555;
+}
+
+svg[role="progressbar"]{
+    width: 75px;
+    height: 75px;
+    margin-bottom: 1em;
+}
+
+svg[role="progressbar"] + span{
+    font-size: 1.1em;
+    color: #727272;
+}
+
+#playlistChoices{
+    margin-top: 1em;
+    margin-bottom: 1.5em;
+}
+
+.playlist-choice input{
+    display: none;
+}
+
+.playlist-choice{
+    margin-bottom: 0.8em;
+    margin-right: 0.8em;
+}
+
+.playlist-choice span{
+    display: inline-block;
+    border: 1px solid #aaa;
+    /* line-height: 1; */
+    border-radius: 5px;
+    padding: 0.6em 1.2em;
+    font-size: 1.1em;
+    letter-spacing: 0.01em;
+    outline: none;
+    cursor: pointer;
+    color: #333;
+}
+
+.playlist-choice span:hover{
+    background: #f8f8f8;
+}
+
+.playlist-choice input:checked + span{
+    background: #f2f2f2;
+}
+
+.playlist-choice span:before{
+    content: '';
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    margin-right: 0.7em;
+    margin-left: -0.5em;
+    border: 2px solid #aaa;
+}
+
+.playlist-choice input:checked + span:before{
+    background: #aaa;
+}

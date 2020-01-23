@@ -1,23 +1,27 @@
 {
-    "name": "queuer",
-    "version": "1.0",
-    "manifest_version": 2,
-    "content_scripts": [
-      {
-        "matches": ["https://www.youtube.com/*"],
-        "js": ["content.js"]
-      }
-    ],
-    "browser_action": {
-      "default_title": "Queuer"
-    },
-    "background": {
-        "scripts": ["background.js"]
-    },
-    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwfVwmfbCwM95ppDevrwmFY+IOBTyoYF2wCvNItk9H5nxVNcoJYMJO7YsNJT4npNHw32gvG2DQcisGJKHSCbwW68hiNb3Lzi+b/olAnW34aAtPAZxxqUTmUU4gxr35AV5MRocHC1JAp3r53EvazCUAUezwK9KUWqy8ZaH+mIWRehL90/FGygcplS8i8pBvkaJ+XY9JEoesYZDQqDYwz4MwN/NhHwSudMusaQkvloa7W/qrdkV4te6zPOTMcIjbubOVDQCwIcAOCTYxzKHNM6bSE/DWqxAnN9s/CYQ7OZXuKqjgj78jaARcS1RatWXr+TD//rQ4TrOPbTY5pRCz6lZYQIDAQAB",
-    "permissions": ["identity", "tabs", "https://accounts.google.com/*", "https://www.googleapis.com/*"],
-    "oauth2": {
-      "client_id": "870299499782-b4blktvhkj226dfhjb3lpvgb4dqsttp5.apps.googleusercontent.com",
-      "scopes": ["profile", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/youtube"]
+  "name": "queuer",
+  "version": "1.0",
+  "manifest_version": 2,
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "all_frames": true
     }
+  ],
+  "browser_action": {
+    "default_title": "Queuer"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "web_accessible_resources": ["popup.htm"],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwfVwmfbCwM95ppDevrwmFY+IOBTyoYF2wCvNItk9H5nxVNcoJYMJO7YsNJT4npNHw32gvG2DQcisGJKHSCbwW68hiNb3Lzi+b/olAnW34aAtPAZxxqUTmUU4gxr35AV5MRocHC1JAp3r53EvazCUAUezwK9KUWqy8ZaH+mIWRehL90/FGygcplS8i8pBvkaJ+XY9JEoesYZDQqDYwz4MwN/NhHwSudMusaQkvloa7W/qrdkV4te6zPOTMcIjbubOVDQCwIcAOCTYxzKHNM6bSE/DWqxAnN9s/CYQ7OZXuKqjgj78jaARcS1RatWXr+TD//rQ4TrOPbTY5pRCz6lZYQIDAQAB",
+  "permissions": ["identity", "tabs", "https://accounts.google.com/*", "https://www.googleapis.com/*"],
+  "oauth2": {
+    "client_id": "870299499782-b4blktvhkj226dfhjb3lpvgb4dqsttp5.apps.googleusercontent.com",
+    "scopes": ["profile", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/youtube"]
+  },
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
