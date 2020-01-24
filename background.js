@@ -5,10 +5,10 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
         else if(request.type === "fetch-playlists")
             fetchUserPlaylists(request.data)
                 .then(response => response.json())
-                .then(async (response) => formatPlaylists(response.items))
+                .then(async (response) => formatPlaylists(response))
                 .then(response => {
                     if(response.error){
-                        callback({error: response.error.message});
+                        callback({error: response.error});
                         return;
                     }
 
@@ -19,7 +19,7 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
                 .then(response => response.json())
                 .then(response => {
                     if(response.error){
-                        callback({error: response.error.message});
+                        callback({error: response.error});
                         return;
                     }
 
@@ -115,9 +115,12 @@ function recursivelyAddVideosToPlaylist(token, playlistId, videos, callback, ind
     });
 }
 
-function formatPlaylists(unformattedPlaylists){
+function formatPlaylists(playlistReponse){
     return new Promise(resolve => {
-        const playlists = unformattedPlaylists.map(playlist => formatPlaylist(playlist));
+        if(!playlistReponse.items || playlistReponse.error)
+            resolve(playlistReponse);
+
+        const playlists = playlistReponse.items.map(playlist => formatPlaylist(playlist));
         resolve(playlists);
     })
 }

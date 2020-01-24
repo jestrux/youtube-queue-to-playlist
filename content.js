@@ -54,6 +54,12 @@ window.addEventListener("message", function(e){
             case "create-playlist":
                 createNewPlaylist(token, payload);
                 break;
+            case "playlist-selected":
+                // addVideosToPlaylist(token, payload, queueVideos);
+                setTimeout(() => {
+                    emitMessage("videos-added");
+                }, 2000);
+                break;
             default:
                 console.log("n\n [QUEUER DEBUGGER] Message from popup: ", action, payload);
                 break;
@@ -113,25 +119,6 @@ async function handleSaveButtonClicked(e){
     }
 }
 
-async function saveVideosToPlaylist(videos){
-    try {
-        const token = await authenticateUser();
-        // const playlistId = await getPrefferedPlaylist(token);
-        // const playlistId = "PLaEj9pMixBr0fLN-vBFvTVe4wTs4rTbrJ";
-        // const videos = ["id28fCyYgIU", "QN0THk3z-eg"];
-        addVideosToPlaylist(token, playlistId, videos);
-    } catch (error) {
-        console.log("\n\n [QUEUER DEBUGGER] Failed to save videos to playlist: ", error);
-    }
-}
-
-function getPrefferedPlaylist(token){
-    return new Promise(async (resolve, reject) => {
-        // fetchUserPlaylists(token);
-        // createNewPlaylist(token, playlistName);
-    });
-}
-
 function authenticateUser(){
     return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage({type: "login"}, ({payload, error}) => {
@@ -182,7 +169,9 @@ function addVideosToPlaylist(token, playlistId, videos){
     chrome.runtime.sendMessage(message, ({payload, error}) => {
         if(error)
             console.log("\n\n [QUEUER DEBUGGER] Error adding videos to playlist, ", error)
-        else
+        else{
             console.log("\n\n [QUEUER DEBUGGER] Videos added to playlist", payload);
+            emitMessage("videos-added");
+        }
     });
 }

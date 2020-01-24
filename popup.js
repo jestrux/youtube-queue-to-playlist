@@ -1,6 +1,5 @@
 window.token = null;
 
-document.querySelector("#closeButton").onclick = (e) => closePopup(e);
 document.querySelector("#existingPlaylistsTabButton").onclick = (e) => fetchPlaylists(e);
 document.querySelector("#existingPlaylistForm").onsubmit = (e) => {
     e.preventDefault();
@@ -18,7 +17,8 @@ function fetchPlaylists(e){
     if(playlistsFetched)
         return;
 
-    e.preventDefault();
+    if(e) e.preventDefault();
+
     emitMessage("fetch-playlists");
     playlistsFetched = true;
 }
@@ -28,8 +28,7 @@ function playlistSelected(playlist){
 }
 
 function closePopup(e){
-    e.preventDefault();
-    console.log(this.$refs);
+    if(e) e.preventDefault();
     emitMessage("close-popup");
 }
 
@@ -39,7 +38,6 @@ function emitMessage(action, payload){
 }
 
 window.addEventListener("message", function(e){
-    // console.log("n\n [QUEUER DEBUGGER] Message from parent: ", e);
     if(e.data && e.data.action){
         const event = new CustomEvent(e.data.action, {detail: e.data.payload})
         window.dispatchEvent(event);

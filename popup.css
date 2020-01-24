@@ -21,7 +21,13 @@ body{
     background: #fff;
     border-radius: 8px;
     box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.2);
-    transition: transform 0.35s ease-out;
+}
+
+#content.transitioning-out{
+    height: 240px;
+    width: 380px;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 
 #content > button {
@@ -186,7 +192,6 @@ svg[role="progressbar"] + span{
 .playlist-choice span{
     display: inline-block;
     border: 1px solid #aaa;
-    /* line-height: 1; */
     border-radius: 5px;
     padding: 0.6em 1.2rem;
     font-size: 1.1rem;
@@ -217,4 +222,45 @@ svg[role="progressbar"] + span{
 
 .playlist-choice input:checked + span:before{
     background: #aaa;
+}
+
+#success span{
+    width: 380px;
+    font-size: 1.15rem;
+    color: #15391f;
+    padding: 0 2.5rem;
+    text-align: center;
+    line-height: 1.8rem;
+}
+
+#content.transitioning-out > *:not(#success){
+    opacity: 0;
+}
+
+#success{
+    bottom: 0;
+    top: 0;
+    background: rgba(87, 238, 129, 1);
+    opacity: 0;
+    pointer-events: none;
+}
+
+#content.transitioning-out #success{
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 1, 1) 0.05s
+}
+
+#success button{
+    margin-top: 1.2rem;
+    background: #5bee83;
+    border: 2px solid #388a4e;
+}
+
+#success button:hover{
+    background: #56d979;
+}
+
+#success button:active{
+    background: #55d778;
 }
