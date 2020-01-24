@@ -1,20 +1,34 @@
 chrome.runtime.onMessage.addListener((request, sender, callback) => {
     try {
         if(request.type === "login")
-            getAuthuser().then(callback);
+            getAuthuser().then(payload => callback({payload}));
         else if(request.type === "fetch-playlists")
             fetchUserPlaylists(request.data)
                 .then(response => response.json())
                 .then(async (response) => formatPlaylists(response.items))
-                .then(callback);
+                .then(response => {
+                    if(response.error){
+                        callback({error: response.error.message});
+                        return;
+                    }
+
+                    callback({payload: response});
+                });
         else if(request.type === "create-playlist")
             createNewPlaylist(request.data)
                 .then(response => response.json())
-                .then(response => callback(formatPlaylist(response)));
+                .then(response => {
+                    if(response.error){
+                        callback({error: response.error.message});
+                        return;
+                    }
+
+                    callback({payload: formatPlaylist(response)});
+                });
         else if(request.type === "add-videos-to-playlist")
             addVideosToPlaylist(request.data, callback);
     } catch (error) {
-        callback(error, true);
+        callback({error});
     }
 
     return true;

@@ -134,9 +134,9 @@ function getPrefferedPlaylist(token){
 
 function authenticateUser(){
     return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({type: "login"}, (payload, error) => {
+        chrome.runtime.sendMessage({type: "login"}, ({payload, error}) => {
             if(error)
-                reject(payload)
+                reject(error)
             else
                 resolve(payload);
         });
@@ -148,22 +148,22 @@ function fetchUserPlaylists(token){
         type: "fetch-playlists", 
         data: token
     };
-    chrome.runtime.sendMessage(message, (payload, error) => {
+    chrome.runtime.sendMessage(message, ({payload, error}) => {
         if(error)
-            console.log("\n\n [QUEUER DEBUGGER] Error fetching user playlists, ", payload)
+            console.log("\n\n [QUEUER DEBUGGER] Error fetching user playlists, ", error)
         else
             emitMessage("playlists-fetched", payload);
     });
 }
 
-function createNewPlaylist(token, title, description = ""){
+function createNewPlaylist(token, title){
     const message = {
         type: "create-playlist", 
         data: {token, title}
     };
-    chrome.runtime.sendMessage(message, (payload, error) => {
+    chrome.runtime.sendMessage(message, ({payload, error}) => {
         if(error)
-            console.log("\n\n [QUEUER DEBUGGER] Error creating playlist, ", payload)
+            console.log("\n\n [QUEUER DEBUGGER] Error creating playlist, ", error)
         else{
             if(!payload.title && payload.snippet)
                 payload.title = payload.snippet.title;
@@ -179,9 +179,9 @@ function addVideosToPlaylist(token, playlistId, videos){
         type: "add-videos-to-playlist", 
         data: {token, playlistId, videos}
     };
-    chrome.runtime.sendMessage(message, (payload, error) => {
+    chrome.runtime.sendMessage(message, ({payload, error}) => {
         if(error)
-            console.log("\n\n [QUEUER DEBUGGER] Error adding videos to playlist, ", payload)
+            console.log("\n\n [QUEUER DEBUGGER] Error adding videos to playlist, ", error)
         else
             console.log("\n\n [QUEUER DEBUGGER] Videos added to playlist", payload);
     });
