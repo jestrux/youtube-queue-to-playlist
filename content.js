@@ -55,10 +55,7 @@ window.addEventListener("message", function(e){
                 createNewPlaylist(token, payload);
                 break;
             case "playlist-selected":
-                // addVideosToPlaylist(token, payload, queueVideos);
-                setTimeout(() => {
-                    emitMessage("videos-added");
-                }, 2000);
+                addVideosToPlaylist(token, payload, queueVideos);
                 break;
             default:
                 console.log("n\n [QUEUER DEBUGGER] Message from popup: ", action, payload);

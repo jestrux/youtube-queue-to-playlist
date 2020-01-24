@@ -26,7 +26,8 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
                     callback({payload: formatPlaylist(response)});
                 });
         else if(request.type === "add-videos-to-playlist")
-            addVideosToPlaylist(request.data, callback);
+            addVideosToPlaylist(request.data)
+                .then(payload => callback({payload}));
     } catch (error) {
         callback({error});
     }
@@ -76,15 +77,13 @@ function createNewPlaylist({title, token}){
     });
 }
 
-function addVideosToPlaylist(data, callback){
-    const {token, playlistId, videos} = data;
-    
-    try {
-        recursivelyAddVideosToPlaylist(token, playlistId, videos, callback);
-    } catch (error) {
-        console.log("\n\n [QUEUER DEBUGGER] Error adding video to playlist: ", error);
-        callback(error, true);
-    }
+function addVideosToPlaylist(data){
+    return new Promise(resolve => {
+        const {token, playlistId, videos} = data;
+        recursivelyAddVideosToPlaylist(token, playlistId, videos, () => {
+            resolve();
+        });
+    });
 }
 
 function recursivelyAddVideosToPlaylist(token, playlistId, videos, callback, index = 0){
