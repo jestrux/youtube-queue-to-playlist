@@ -5,11 +5,7 @@ var queueVideos;
 
 window.onload = function(){
     miniPlayer = document.querySelector("ytd-miniplayer");
-    console.log("\n\n [QUEUER DEBUGGER] window loaded\n\n ");
-    // console.log("Mini player: ", miniPlayer);
-
     var observer = new MutationObserver(function(mutations) {
-        // console.log("Mini player changed", mutations);
         const playlistActiveAttributes = mutations.filter(({attributeName}) => attributeName === "active");
         const isExpanded = playlistActiveAttributes.length > 0;
 
@@ -35,8 +31,6 @@ function setupPopup(){
     popup.id = "QUEUER-IFRAME";
     document.body.appendChild(popup);
     popupWindow = popup.contentWindow;
-
-    console.log("n\n [QUEUER DEBUGGER] Pop up has been set up");
 }
 
 window.addEventListener("message", function(e){
@@ -70,7 +64,6 @@ function emitMessage(action, payload){
 }
 
 function addSavePlaylistButton(){
-    // console.log("\n\n [QUEUER DEBUGGER] Creating playlist save button....");
     const button = document.createElement("button");
     button.innerText = "SAVE PLAYLIST";
     button.classList.add("queue-playlist-saver");
@@ -92,7 +85,6 @@ function addSavePlaylistButton(){
 
 async function handleSaveButtonClicked(e){
     e.stopPropagation();
-    console.log("\n\n [QUEUER DEBUGGER] creating playlist button clicked....");
     const queueItems = document.querySelectorAll("ytd-playlist-panel-video-renderer > a");
     let queueLinks = Array.from(queueItems).map(a => (
         {
@@ -102,8 +94,7 @@ async function handleSaveButtonClicked(e){
         }
     ));
     queueLinks = queueLinks.filter((_, index) => index < queueLinks.length / 2);
-    queueVideos = queueLinks.map(({url}) => url.split("watch?v=")[1]);    
-    console.log("\n\n [QUEUER DEBUGGER] Queue videi ids: ", queueVideos);
+    queueVideos = queueLinks.map(({url}) => url.split("watch?v=")[1]);
 
     popup.classList.add("visible");
     
@@ -153,7 +144,6 @@ function createNewPlaylist(token, title){
                 payload.title = payload.snippet.title;
                 
             emitMessage("playlist-created", payload);
-            console.log("\n\n [QUEUER DEBUGGER] Playlist created", payload);
         }
     });
 }
@@ -167,7 +157,6 @@ function addVideosToPlaylist(token, playlistId, videos){
         if(error)
             console.log("\n\n [QUEUER DEBUGGER] Error adding videos to playlist, ", error)
         else{
-            console.log("\n\n [QUEUER DEBUGGER] Videos added to playlist", payload);
             emitMessage("videos-added");
         }
     });

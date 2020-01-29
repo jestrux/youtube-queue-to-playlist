@@ -33,7 +33,7 @@
         <div x-show="tab === 'add'">
             <form id="newPlaylistForm"
                 @submit="creatingPlaylist = true"
-                @playlist-created.window="creatingPlaylist = false; playlistChoice = $event.detail; addingVideos = true">
+                @playlist-created.window="creatingPlaylist = false; playlistChoice = $event.detail; addingVideos = true; playlistSelected($event.detail.id)">
                 <label class="label">
                     Playlist Name&emsp;
                     <input required name="playlist" type="text" />
