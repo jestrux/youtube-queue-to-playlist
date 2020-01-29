@@ -13,4 +13,4 @@ A chrome extension to convert youtube queues to playlists
 - Open chrome extensions and turn on developer mode
 - Drag and drop this project file into the extensions
 
-* Feel free to fork and ship it as your own extension if unlikke me you're not skeptical that youtube will release the official way to do this in a few months or so 😊.
+* Feel free to fork and ship it as your own extension if unlike me you're not skeptical that youtube will release the official way to do this in a few months or so 😊.
