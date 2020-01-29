@@ -2,6 +2,10 @@
 
 A chrome extension to convert youtube queues to playlists
 
+### Demo
+
+![Demo](./demo.gif)
+
 ### Simple Usage
 
 - Obtain a client id from google developer console.
